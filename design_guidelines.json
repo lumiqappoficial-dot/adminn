@@ -1,0 +1,171 @@
+{
+  "project_name": "LumiqAdmin - Panel de Administración",
+  "app_type": "dashboard",
+  "language": "es",
+  "colors": {
+    "surfaces": [
+      {
+        "name": "page",
+        "kind": "solid",
+        "bg": "#0B0D17",
+        "on_bg": "#F3F4F6",
+        "on_bg_muted": "#9CA3AF"
+      },
+      {
+        "name": "panel",
+        "kind": "solid",
+        "bg": "#12172A",
+        "on_bg": "#F9FAFB",
+        "on_bg_muted": "#A5B4FC"
+      },
+      {
+        "name": "sidebar",
+        "kind": "solid",
+        "bg": "#0D1122",
+        "on_bg": "#F3F4F6",
+        "on_bg_muted": "#94A3B8",
+        "roles": {
+          "active_item": "#6366F1",
+          "active_text": "#FFFFFF",
+          "border": "#1E293B"
+        }
+      },
+      {
+        "name": "card",
+        "kind": "solid",
+        "bg": "#181E38",
+        "on_bg": "#FFFFFF",
+        "on_bg_muted": "#94A3B8",
+        "roles": {
+          "code_badge_bg": "#312E81",
+          "code_badge_text": "#C7D2FE",
+          "whatsapp_btn_bg": "#22C55E",
+          "whatsapp_btn_text": "#FFFFFF",
+          "copy_btn_bg": "#4F46E5",
+          "copy_btn_text": "#FFFFFF",
+          "status_active": "#10B981",
+          "status_expired": "#EF4444",
+          "status_pending": "#F59E0B"
+        }
+      },
+      {
+        "name": "modal",
+        "kind": "solid",
+        "bg": "#151B33",
+        "on_bg": "#F9FAFB",
+        "on_bg_muted": "#9CA3AF"
+      },
+      {
+        "name": "table_header",
+        "kind": "solid",
+        "bg": "#1E264A",
+        "on_bg": "#E0E7FF",
+        "on_bg_muted": "#A5B4FC"
+      },
+      {
+        "name": "table_row_alt",
+        "kind": "solid",
+        "bg": "#131930",
+        "on_bg": "#F3F4F6",
+        "on_bg_muted": "#9CA3AF"
+      },
+      {
+        "name": "login_hero",
+        "kind": "solid",
+        "bg": "#0F1426",
+        "on_bg": "#FFFFFF",
+        "on_bg_muted": "#C7D2FE"
+      }
+    ],
+    "accent": "#6366F1",
+    "on_accent": "#FFFFFF",
+    "secondary_accent": "#8B5CF6",
+    "border_color": "#263056"
+  },
+  "typography": {
+    "font_family_heading": "Outfit, system-ui, -apple-system, sans-serif",
+    "font_family_body": "Plus Jakarta Sans, system-ui, -apple-system, sans-serif",
+    "font_family_mono": "JetBrains Mono, monospace",
+    "scale_px": {
+      "display": 48,
+      "h1": 36,
+      "h2": 28,
+      "h3": 20,
+      "body": 16,
+      "caption": 14
+    }
+  },
+  "entry_surfaces": {
+    "/": "Branded Violet-Blue auth portal: Lumiq brandmark and Google SSO trigger card centered over geometric glowing grid, with dynamic loading state ('Iniciando...'), seamless redirection to full admin panel or limited non-admin user view."
+  },
+  "visual_enhancers": {
+    "theme": "Violeta Azul (Deep Violet-Blue Dark Mode with energetic Indigo/Violet glow accents)",
+    "aesthetic": "Tactical modern dashboard with 1px luminescent borders, crisp pill badges, and elevated glass cards",
+    "code_cards": "Distinct 6-digit display with high-contrast mono font, instant 1-click clipboard copy feedback, and dedicated WhatsApp click-to-chat action generator (wa.me/numero?text=...)"
+  },
+  "grids_and_layouts": {
+    "layout_mode": "Sidebar + Header + Dynamic Main Content area with high density scanability",
+    "sidebar": "Fixed 260px desktop collapsible sidebar with quick navigation across: 'Dashboard General', 'Códigos de 6 Dígitos', 'Usuarios', 'Roles', 'Números', 'Celulares', 'Dispositivos', 'Configuración de Supabase / RPCs'",
+    "code_grid": "Responsive grid: grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 with prominent OTP code preview, phone assignment, retry counter (intentos), and WhatsApp action button",
+    "tables_layout": "Full width responsive data tables with searchable filters, status chips, pagination, inline CRUD modals, and role selector RPC triggers"
+  },
+  "motion": {
+    "transitions": "transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease, opacity 0.18s ease",
+    "card_hover": "hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(99,102,241,0.18)] hover:border-[#6366F1]",
+    "loading_pulse": "Smooth subtle pulsing glowing ring for 'Iniciando...' state and RPC execution feedback"
+  },
+  "accessibility": {
+    "contrast_compliance": "WCAG AA (minimum 4.5:1 text to background contrast on all surfaces)",
+    "test_ids": "All interactive inputs, Google auth button, tabs, modals, copy buttons, and WhatsApp buttons must include data-testid in kebab-case",
+    "focus_states": "High contrast ring outline: ring-2 ring-[#818CF8] ring-offset-2 ring-offset-[#0B0D17]"
+  },
+  "key_components": [
+    {
+      "name": "Auth & Registration Screen",
+      "description": "Initial screen featuring Google sign-in trigger, loading state 'Iniciando...', account verification check, and conditional registration modal asking for mandatory fields (nombre, numero) + optional admin details (apellido, fecha_nacimiento, genero, ubicacion, foto_perfil).",
+      "data_testids": [
+        "google-login-btn",
+        "auth-loading-indicator",
+        "register-nombre-input",
+        "register-numero-input",
+        "register-submit-btn"
+      ]
+    },
+    {
+      "name": "6-Digit Codes Manager ('Códigos')",
+      "description": "Dedicated view displaying generated 6-digit verification codes, associated phone numbers, status (Activo, Expirado, Usado), retry attempts count, quick Copy Code button, and 'Enviar por WhatsApp' direct link button with pre-filled message.",
+      "data_testids": [
+        "code-card",
+        "copy-code-btn",
+        "whatsapp-link-btn",
+        "code-search-input"
+      ]
+    },
+    {
+      "name": "Admin Data Tables (Supabase Schema)",
+      "description": "Tabbed management for 'usuarios', 'roles', 'numero', 'celular', and 'dispositivos', supporting CRUD actions and Supabase RPC triggers (crear_mi_usuario, obtener_mi_usuario, admin_ver_codigo, admin_cambiar_rol).",
+      "data_testids": [
+        "tab-usuarios",
+        "tab-roles",
+        "tab-numero",
+        "tab-celular",
+        "tab-dispositivos",
+        "admin-change-role-btn"
+      ]
+    },
+    {
+      "name": "Non-Admin Limited View",
+      "description": "Restricted dashboard for regular users allowing profile viewing and personal code status without administrative CRUD permissions."
+    }
+  ],
+  "instructions_to_main_agent": [
+    "Build a high-performance, polished administration app supporting the LumiqAdmin requirements in Spanish.",
+    "Deliver the core interactive web application with the Violeta Azul palette (#0B0D17 base, #12172A panels, #6366F1 accent) matching the design token specs.",
+    "Implement the authentication workflow: Google login button -> 'Iniciando...' state -> account existence verification -> registration if not found (with nombre and numero as required fields).",
+    "Implement the 'Códigos' view featuring 6-digit OTP cards with phone number link, estado badge, intentos counter, instant clipboard copy action with toast notification, and WhatsApp direct messaging button (wa.me/numero?text=Su%20c%C3%B3digo%20de%20verificaci%C3%B3n%20es%3A%20XXXXXX).",
+    "Provide tables and views for all requested Supabase collections/tables: usuarios, roles, numero, celular, dispositivos, along with simulated/configured RPC handlers for crear_mi_usuario, obtener_mi_usuario, admin_ver_codigo, and admin_cambiar_rol.",
+    "Support a mock/configured Supabase credentials bar/modal where the user can inspect or insert their own Supabase URL & API key dynamically.",
+    "Ensure non-admin users entering have an appropriate limited view banner and restricted action permissions.",
+    "Add 'data-testid' attributes to all buttons, tabs, inputs, and cards for end-to-end testing stability."
+  ]
+}

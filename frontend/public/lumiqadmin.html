@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lumiq Admin</title>
+  <meta name="description" content="Panel de administración Lumiq (Supabase)" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --page: #0B0D17; --panel: #12172A; --sidebar: #0D1122; --card: #181E38; --modal: #151B33;
+      --thead: #1E264A; --row-alt: #131930; --border: #263056; --border-soft: #1E293B;
+      --text: #F3F4F6; --muted: #9CA3AF; --muted-2: #A5B4FC;
+      --accent: #6366F1; --accent-2: #8B5CF6; --accent-soft: #312E81; --accent-text: #C7D2FE;
+      --ok: #10B981; --bad: #EF4444; --warn: #F59E0B; --wa: #22C55E;
+      --f-head: "Outfit", system-ui, sans-serif; --f-body: "Plus Jakarta Sans", system-ui, sans-serif; --f-mono: "JetBrains Mono", ui-monospace, monospace;
+      --t: background-color .18s ease, border-color .18s ease, transform .18s ease, opacity .18s ease, box-shadow .18s ease;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--page); color: var(--text); font-family: var(--f-body); font-size: 15px; }
+    h1, h2, h3 { font-family: var(--f-head); margin: 0; letter-spacing: -.01em; }
+    button, input, select { font: inherit; }
+    a { color: var(--muted-2); }
+    .hidden { display: none !important; }
+    :focus-visible { outline: 2px solid #818CF8; outline-offset: 2px; }
+
+    /* ---------- Botones ---------- */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 9px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; font-weight: 600; font-size: 13.5px; text-decoration: none; transition: var(--t); white-space: nowrap; }
+    .btn:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .btn:active { transform: translateY(0) scale(.98); }
+    .btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #575BEA; box-shadow: 0 6px 20px rgba(99,102,241,.35); }
+    .btn-wa { background: var(--wa); border-color: var(--wa); color: #fff; }
+    .btn-wa:hover { background: #1FAF54; border-color: #1FAF54; box-shadow: 0 6px 18px rgba(34,197,94,.3); }
+    .btn-danger { color: #FCA5A5; border-color: #4C1D2B; }
+    .btn-danger:hover { background: #3B1220; border-color: var(--bad); }
+    .btn-sm { padding: 6px 10px; font-size: 12.5px; border-radius: 8px; }
+    .btn-ghost { background: transparent; }
+
+    /* ---------- Pantallas de auth ---------- */
+    .auth { min-height: 100vh; display: grid; grid-template-columns: 1.1fr 1fr; }
+    .auth-art { position: relative; overflow: hidden; background: radial-gradient(900px 500px at 20% 20%, rgba(99,102,241,.35), transparent 60%), radial-gradient(700px 500px at 80% 90%, rgba(139,92,246,.28), transparent 60%), #0F1426; padding: 56px; display: flex; flex-direction: column; justify-content: space-between; }
+    .auth-art::before { content: ""; position: absolute; inset: 0; background-image: linear-gradient(rgba(165,180,252,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(165,180,252,.07) 1px, transparent 1px); background-size: 44px 44px; mask-image: radial-gradient(circle at 30% 40%, #000 0%, transparent 75%); }
+    .brand { position: relative; display: flex; align-items: center; gap: 12px; font-family: var(--f-head); font-weight: 700; font-size: 22px; }
+    .brand-mark { width: 38px; height: 38px; border-radius: 11px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); display: grid; place-items: center; box-shadow: 0 0 24px rgba(99,102,241,.55); font-size: 18px; }
+    .auth-copy { position: relative; max-width: 460px; }
+    .auth-copy h1 { font-size: 46px; line-height: 1.05; font-weight: 700; }
+    .auth-copy h1 span { background: linear-gradient(90deg, #A5B4FC, #C4B5FD); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .auth-copy p { color: var(--accent-text); margin-top: 16px; line-height: 1.6; }
+    .auth-foot { position: relative; color: var(--muted); font-size: 12.5px; }
+    .auth-side { display: flex; align-items: center; justify-content: flex-start; padding: 56px 64px; background: var(--page); }
+    .auth-card { width: 100%; max-width: 420px; }
+    .auth-card h2 { font-size: 28px; }
+    .auth-card .sub { color: var(--muted); margin: 8px 0 28px; line-height: 1.5; }
+    .btn-google { width: 100%; padding: 14px 18px; background: #fff; color: #1F2937; border: 1px solid #fff; border-radius: 12px; font-size: 15px; font-weight: 700; gap: 12px; }
+    .btn-google:hover { background: #EEF0FF; border-color: #C7D2FE; box-shadow: 0 10px 30px rgba(99,102,241,.35); }
+    .note { margin-top: 18px; font-size: 12.5px; color: var(--muted); line-height: 1.55; }
+    .alert { margin-top: 16px; padding: 12px 14px; border-radius: 10px; background: #2A1220; border: 1px solid #5B1E33; color: #FECACA; font-size: 13px; line-height: 1.5; }
+
+    .loader-wrap { min-height: 100vh; display: grid; place-items: center; text-align: center; }
+    .ring { width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 22px; border: 3px solid rgba(99,102,241,.2); border-top-color: var(--accent); border-right-color: var(--accent-2); animation: spin 1s linear infinite, glow 1.6s ease-in-out infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes glow { 0%,100% { box-shadow: 0 0 0 rgba(99,102,241,0); } 50% { box-shadow: 0 0 34px rgba(99,102,241,.55); } }
+    .loader-wrap h2 { font-size: 24px; }
+    .loader-wrap p { color: var(--muted); margin-top: 6px; }
+
+    /* ---------- Formularios ---------- */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { font-size: 12.5px; color: var(--muted-2); font-weight: 600; }
+    .field label .req { color: #F9A8D4; }
+    .input { width: 100%; padding: 10px 12px; border-radius: 10px; background: #0E1328; border: 1px solid var(--border); color: var(--text); transition: var(--t); }
+    .input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99,102,241,.22); }
+    .input[readonly] { opacity: .7; }
+    .hint { font-size: 11.5px; color: var(--muted); }
+    .register { min-height: 100vh; display: flex; align-items: center; padding: 48px 24px; }
+    .register-card { width: 100%; max-width: 720px; margin: 0 auto 0 12vw; background: var(--panel); border: 1px solid var(--border); border-radius: 18px; padding: 32px; box-shadow: 0 24px 60px rgba(0,0,0,.4); }
+    .register-card h2 { font-size: 26px; }
+    .register-card .sub { color: var(--muted); margin: 6px 0 24px; }
+    .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; border: 1px solid transparent; }
+    .pill-accent { background: var(--accent-soft); color: var(--accent-text); border-color: #4338CA; }
+    .pill-ok { background: rgba(16,185,129,.12); color: #6EE7B7; border-color: rgba(16,185,129,.35); }
+    .pill-bad { background: rgba(239,68,68,.12); color: #FCA5A5; border-color: rgba(239,68,68,.35); }
+    .pill-warn { background: rgba(245,158,11,.12); color: #FCD34D; border-color: rgba(245,158,11,.35); }
+    .pill-mute { background: #1A2040; color: var(--muted); border-color: var(--border); }
+
+    /* ---------- Layout del panel ---------- */
+    .app { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+    .sidebar { background: var(--sidebar); border-right: 1px solid var(--border-soft); padding: 22px 14px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 22px; }
+    .nav { display: flex; flex-direction: column; gap: 4px; }
+    .nav-label { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: #64748B; padding: 0 12px; margin: 8px 0 4px; }
+    .nav button { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 10px 12px; border-radius: 10px; background: transparent; border: 1px solid transparent; color: var(--muted); cursor: pointer; font-weight: 600; transition: var(--t); }
+    .nav button:hover { background: #151B33; color: var(--text); }
+    .nav button.active { background: var(--accent); color: #fff; box-shadow: 0 6px 18px rgba(99,102,241,.35); }
+    .nav .ico { width: 18px; text-align: center; }
+    .side-foot { margin-top: auto; padding: 12px; border: 1px solid var(--border-soft); border-radius: 12px; background: #10152A; font-size: 12px; color: var(--muted); }
+    .main { min-width: 0; display: flex; flex-direction: column; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 32px; border-bottom: 1px solid var(--border-soft); background: rgba(11,13,23,.8); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 5; }
+    .who { display: flex; align-items: center; gap: 12px; }
+    .avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background: var(--accent-soft); display: grid; place-items: center; font-weight: 700; color: var(--accent-text); border: 1px solid var(--border); }
+    .who .name { font-weight: 700; font-size: 14px; }
+    .who .mail { font-size: 12px; color: var(--muted); }
+    .content { padding: 28px 32px 48px; }
+    .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+    .page-head h1 { font-size: 30px; }
+    .page-head p { color: var(--muted); margin: 6px 0 0; }
+    .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .toolbar .input { width: 240px; }
+    .banner { padding: 12px 16px; border-radius: 12px; border: 1px solid #4338CA; background: rgba(49,46,129,.35); color: var(--accent-text); margin-bottom: 20px; font-size: 13.5px; }
+
+    /* ---------- Resumen ---------- */
+    .stats { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; }
+    .stat { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; cursor: pointer; transition: var(--t); }
+    .stat:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: 0 8px 24px rgba(99,102,241,.18); }
+    .stat .k { color: var(--muted-2); font-size: 12.5px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+    .stat .v { font-family: var(--f-head); font-size: 40px; font-weight: 700; margin-top: 8px; }
+    .stat.big { grid-row: span 2; background: linear-gradient(160deg, #23206B 0%, var(--card) 70%); }
+    .stat.big .v { font-size: 64px; }
+
+    /* ---------- Tablas ---------- */
+    .table-wrap { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; overflow: auto; max-height: calc(100vh - 220px); }
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    thead th { position: sticky; top: 0; background: var(--thead); color: #E0E7FF; text-align: left; padding: 11px 14px; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; z-index: 1; }
+    tbody td { padding: 10px 14px; border-top: 1px solid var(--border-soft); white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+    tbody tr:nth-child(even) { background: var(--row-alt); }
+    tbody tr:hover { background: #1A2142; }
+    td.actions { display: flex; gap: 6px; max-width: none; }
+    .mono { font-family: var(--f-mono); }
+    .empty { padding: 40px; text-align: center; color: var(--muted); }
+    .count { color: var(--muted); font-size: 12.5px; margin-top: 10px; }
+    .select-inline { padding: 5px 8px; border-radius: 8px; background: #0E1328; color: var(--text); border: 1px solid var(--border); }
+
+    /* ---------- Codigos ---------- */
+    .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .chip { padding: 7px 12px; border-radius: 999px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; font-weight: 600; font-size: 12.5px; transition: var(--t); }
+    .chip:hover { color: var(--text); border-color: var(--accent); }
+    .chip.active { background: var(--accent-soft); color: var(--accent-text); border-color: var(--accent); }
+    .codes { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 18px; margin-top: 18px; }
+    .code-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 14px; transition: var(--t); animation: rise .35s ease both; }
+    .code-card:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: 0 8px 24px rgba(99,102,241,.18); }
+    @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .code-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .code-digits { display: flex; gap: 6px; }
+    .code-digits span { width: 40px; height: 50px; border-radius: 10px; background: var(--accent-soft); color: #E0E7FF; display: grid; place-items: center; font-family: var(--f-mono); font-weight: 700; font-size: 24px; border: 1px solid #4338CA; }
+    .code-card.used .code-digits span { background: #1A2040; color: var(--muted); border-color: var(--border); }
+    .code-meta { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 13px; }
+    .code-meta dt { color: var(--muted); }
+    .code-meta dd { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .code-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .code-actions .btn { flex: 1; }
+
+    /* ---------- Modal y toast ---------- */
+    .modal-bg { position: fixed; inset: 0; background: rgba(5,7,15,.7); backdrop-filter: blur(4px); display: grid; place-items: center; z-index: 50; padding: 20px; animation: fade .18s ease; }
+    @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+    .modal { width: 100%; max-width: 640px; max-height: 90vh; overflow: auto; background: var(--modal); border: 1px solid var(--border); border-radius: 16px; padding: 24px; box-shadow: 0 30px 80px rgba(0,0,0,.5); animation: rise .2s ease; }
+    .modal h3 { font-size: 20px; margin-bottom: 18px; }
+    .modal-foot { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
+    .toasts { position: fixed; right: 20px; bottom: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 60; }
+    .toast { min-width: 240px; max-width: 380px; padding: 12px 14px; border-radius: 12px; background: #1B2244; border: 1px solid var(--border); color: var(--text); font-size: 13.5px; box-shadow: 0 10px 30px rgba(0,0,0,.4); animation: rise .2s ease; }
+    .toast.ok { border-color: rgba(16,185,129,.5); }
+    .toast.err { border-color: rgba(239,68,68,.6); }
+
+    @media (max-width: 900px) {
+      .auth { grid-template-columns: 1fr; }
+      .auth-art { padding: 32px; min-height: 260px; }
+      .auth-copy h1 { font-size: 32px; }
+      .auth-side { padding: 32px; }
+      .app { grid-template-columns: 1fr; }
+      .sidebar { position: static; height: auto; }
+      .nav { flex-direction: row; flex-wrap: wrap; }
+      .nav button { width: auto; }
+      .side-foot, .nav-label { display: none; }
+      .content, .topbar { padding-left: 16px; padding-right: 16px; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .register-card { margin: 0 auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. LOGIN: solo boton de Google -->
+  <section id="screen-login" class="auth hidden" data-testid="screen-login">
+    <div class="auth-art">
+      <div class="brand"><div class="brand-mark">L</div>Lumiq Admin</div>
+      <div class="auth-copy">
+        <h1>Controla <span>usuarios, números y códigos</span> desde un solo lugar.</h1>
+        <p>Panel conectado a tu base de datos Supabase. Ingresa con tu cuenta de Google para continuar.</p>
+      </div>
+      <div class="auth-foot">Acceso protegido por RLS · Supabase Auth</div>
+    </div>
+    <div class="auth-side">
+      <div class="auth-card">
+        <h2>Bienvenido</h2>
+        <p class="sub">Inicia sesión para administrar. Si aún no tienes cuenta, te pediremos tus datos.</p>
+        <button id="btn-google" class="btn btn-google" data-testid="google-login-btn">
+          <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+          Continuar con Google
+        </button>
+        <div id="login-error" class="alert hidden" data-testid="login-error"></div>
+        <p class="note">Al continuar se verifica si ya tienes cuenta en <span class="mono">usuarios</span>. Si no, se muestra el formulario para crearla.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. CARGANDO / INICIANDO -->
+  <section id="screen-loading" class="loader-wrap" data-testid="auth-loading-indicator">
+    <div>
+      <div class="ring"></div>
+      <h2 id="loading-title">Iniciando…</h2>
+      <p id="loading-sub">Preparando Lumiq Admin</p>
+    </div>
+  </section>
+
+  <!-- 3. REGISTRO: datos obligatorios de crear_mi_usuario -->
+  <section id="screen-register" class="register hidden" data-testid="screen-register">
+    <div class="register-card">
+      <div class="brand" style="font-size:18px;margin-bottom:18px"><div class="brand-mark" style="width:32px;height:32px;font-size:15px">L</div>Lumiq</div>
+      <h2>Crea tu cuenta</h2>
+      <p class="sub">Sesión iniciada como <b id="reg-email" data-testid="register-email"></b>. <span id="reg-admin-tag" class="pill pill-accent hidden">Correo administrador: todos los campos son obligatorios</span></p>
+      <form id="form-register" class="form-grid" novalidate>
+        <div class="field"><label>Nombre <span class="req">*</span></label><input class="input" name="nombre" maxlength="100" required data-testid="register-nombre-input" /></div>
+        <div class="field"><label>Apellido <span class="req adm">*</span></label><input class="input" name="apellido" maxlength="100" data-testid="register-apellido-input" /></div>
+        <div class="field"><label>Número de celular <span class="req">*</span></label><input class="input" name="numero" maxlength="20" placeholder="+59170000000" required data-testid="register-numero-input" /><span class="hint">7 a 15 dígitos, puede empezar con +</span></div>
+        <div class="field"><label>Fecha de nacimiento <span class="req adm">*</span></label><input class="input" type="date" name="fecha_nacimiento" data-testid="register-fecha-input" /></div>
+        <div class="field"><label>Género <span class="req adm">*</span></label>
+          <select class="input" name="genero" data-testid="register-genero-select"><option value="">Selecciona…</option><option>Masculino</option><option>Femenino</option><option>Otro</option></select></div>
+        <div class="field"><label>Ubicación <span class="req adm">*</span></label><input class="input" name="ubicacion" maxlength="255" placeholder="Ciudad, País" data-testid="register-ubicacion-input" /></div>
+        <div class="field full"><label>Foto de perfil (URL) <span class="req adm">*</span></label><input class="input" name="foto_perfil" maxlength="255" data-testid="register-foto-input" /></div>
+        <div id="reg-error" class="alert field full hidden" data-testid="register-error"></div>
+        <div class="field full" style="flex-direction:row;justify-content:space-between;margin-top:6px">
+          <button type="button" class="btn btn-ghost" id="btn-reg-logout" data-testid="register-logout-btn">Cambiar de cuenta</button>
+          <button type="submit" class="btn btn-primary" id="btn-reg-submit" data-testid="register-submit-btn">Crear cuenta e ingresar</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- 4. PANEL -->
+  <section id="screen-app" class="app hidden" data-testid="screen-app">
+    <aside class="sidebar">
+      <div class="brand" style="font-size:19px;padding:0 6px"><div class="brand-mark" style="width:32px;height:32px;font-size:15px">L</div>Lumiq Admin</div>
+      <nav id="nav" class="nav" data-testid="sidebar-nav"></nav>
+      <div class="side-foot">Conectado a Supabase<br /><span id="sb-host" class="mono" style="color:#A5B4FC"></span></div>
+    </aside>
+    <div class="main">
+      <header class="topbar">
+        <div class="who">
+          <div id="who-avatar" class="avatar" data-testid="user-avatar"></div>
+          <div><div class="name" id="who-name" data-testid="user-name"></div><div class="mail" id="who-mail" data-testid="user-email"></div></div>
+          <span id="who-role" class="pill pill-accent" data-testid="user-role-badge"></span>
+        </div>
+        <button class="btn btn-sm" id="btn-logout" data-testid="logout-btn">Cerrar sesión</button>
+      </header>
+      <main id="content" class="content" data-testid="main-content"></main>
+    </div>
+  </section>
+
+  <div id="modal-root"></div>
+  <div id="toasts" class="toasts" data-testid="toast-container"></div>
+
+  <script src="lumiqadmin.js"></script>
+</body>
+</html>
